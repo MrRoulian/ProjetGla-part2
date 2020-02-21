@@ -7,7 +7,6 @@ import javax.ejb.MessageDrivenContext;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.persistence.criteria.Order;
 
 @MessageDriven(activationConfig = {
     @ActivationConfigProperty(
@@ -18,7 +17,7 @@ import javax.persistence.criteria.Order;
     propertyValue = "javax.jms.Queue"),
     @ActivationConfigProperty(
     propertyName = "destinationLookup",
-    propertyValue = "jms/OrderQueue")
+    propertyValue = "jms/FacturationQueue")
 })
 public class Facturation implements MessageListener {
     
@@ -28,15 +27,15 @@ public class Facturation implements MessageListener {
     @Override
     public void onMessage(Message message) {
         try {
-            Order order = message.getBody(Order.class);
-            processTicket(order);
+            String reveive = message.getBody(String.class);
+            processTicket(reveive);
         }catch (JMSException jmse) {
             jmse.printStackTrace();
             context.setRollbackOnly();
         }
     }
 
-    private void processTicket(Order order) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void processTicket(String ticket) {
+        System.out.println("On me demande ma facture avec ce message : "+ticket);
     }
 }
