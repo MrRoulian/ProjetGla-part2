@@ -1,9 +1,13 @@
 package facturation;
 
+import java.io.Serializable;
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import javax.ejb.MessageDrivenContext;
+import javax.inject.Inject;
+import javax.jms.Destination;
+import javax.jms.JMSContext;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -21,8 +25,14 @@ import javax.jms.MessageListener;
 })
 public class Facturation implements MessageListener {
     
+    @Inject
+    JMSContext jmsContext;
+    
     @Resource
     private MessageDrivenContext context;
+    
+    @Resource(lookup = "jms/RecepFacture")
+    Destination RecepFacture;
 
     @Override
     public void onMessage(Message message) {
@@ -36,6 +46,8 @@ public class Facturation implements MessageListener {
     }
 
     private void processTicket(String ticket) {
-        System.out.println("On me demande ma facture avec ce message : "+ticket);
+        //System.out.println("On me demande ma facture avec ce message : "+ticket);
+        String res = "Commande "+ticket+" facturé";
+        jmsContext.createProducer().send(RecepFacture, (Serializable)res);
     }
 }
